@@ -1,0 +1,29 @@
+
+services:     #"services" est utilisé ici pour déclarer les conteneurs que nous allons executer dans le projet. Ici il y'a deux services la base de données et l'app wordpress
+  basededonnees: # Le nom du  premier service c'est à dire nom du conteneur de la base de  données
+    image: mysql:5.7  # c'est l'image utilisé par sql pour lancer le conteneur. On a pris cette version parce qu'il est fiable et a continue d'être utilsé 
+    environment:
+      MYSQL_ROOT_PASSWORD: admin0712 # c'est le mot de passe de l'administrateur 
+      MYSQL_DATABASE: Bd_Wordpress  # le nom de la base de données
+      MYSQL_USER: Utilisateur_Aman  #Le nom de l'utilisateur 
+      MYSQL_PASSWORD: kramo         # Son mot de passe
+    volumes:                      # c'est ici qu'on met le volume. il permet de conserver les informations de la base de données même si le conteneur est supprimé
+      - bd:/var/lib/mysql         # C'est le répertoire par defaut dans lequel mysql stocke les bases de données
+
+  wordpress:      # Le nom du deuxième service c'est à dire nom du conteneur de l'app wordpress
+    depends_on:  
+      - basededonnees # Ici on veut dire que le demarrage de l'app wordpress dépend du conteneur de la base de données.Celui de wordpress sera lancé après celui dela base e données 
+    image: wordpress:latest  # On dit ici à docker doit utiliser la dernière version de l'image de wordpress disponible
+    ports:
+      - "2000:80"  # Ce sont les ports. "2000" c'est le port de ma machine lancé localement pour accéder à wordpress sur le port "80" dans le conteneur
+    environment:   # on définit les configurations de wordpress pour qu'il se connecte à la base de données
+      WORDPRESS_DB_HOST: basededonnees
+      WORDPRESS_DB_USER: Utilisateur_Aman
+      WORDPRESS_DB_PASSWORD: kramo
+      WORDPRESS_DB_NAME: Bd_Wordpress
+    volumes:
+      - wordpress_donnees:/var/www/html
+
+volumes:
+  bd:       #stocke les données de la base de données
+  wordpress_donnees:    # stocke les données de wordpress
